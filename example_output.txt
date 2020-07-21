@@ -1,0 +1,55 @@
+
+%begin 1595348076 14857 0
+%end 1595348076 14857 0
+%session-changed $4 4
+%output %22 s
+%output %22 \010ss
+%output %22 h
+%output %22
+%output %22 s
+%output %22 o
+%output %22 l
+%output %22 s
+%output %22 y
+%output %22 s
+%output %22 .
+%output %22 i
+%output %22 o
+%output %22 \033[?2004l\015\015\012
+%window-renamed @22 ssh
+%output %22 Welcome to Ubuntu 18.04.4 LTS (GNU/Linux 4.15.0-112-generic x86_64)\015\012\015\012 * Documentation:  https://help.ubuntu.com\0
+15\012 * Management:     https://landscape.canonical.com\015\012 * Support:        https://ubuntu.com/advantage\015\012\015\012  System inf
+ormation as of Tue Jul 21 16:14:40 UTC 2020\015\012\015\012  System load:  0.19               Users logged in:        0\015\012  Usage of /
+:   64.7% of 77.36GB   IP address for eth0:    157.230.29.188\015\012  Memory usage: 60%                IP address for ens4:    10.135.85.2
+18\015\012  Swap usage:   0%                 IP address for docker0: 172.17.0.1\015\012  Processes:    239\015\012\015\012  Get cloud suppo
+rt with Ubuntu Advantage Cloud Guest:\015\012    http://www.ubuntu.com/business/services/cloud\015\012\015\012 * Canonical Livepatch is ava
+ilable for installation.\015\012   - Reduce system reboots and improve kernel security. Activate at:\015\012     https://ubuntu.com/livepat
+ch\015\012\015\0120 packages can be updated.\015\0120 updates are security updates.\015\012\015\012\015\012Last login: Tue Jul 21 16:14:12
+2020 from 178.164.131.7\015\015\012
+%output %22 \033[01;32mpeter@sol\033[00m:\033[01;34m~\033[00m$
+%output %22 \015\012\033[01;32mpeter@sol\033[00m:\033[01;34m~\033[00m$
+%output %22 \015\012\033[01;32mpeter@sol\033[00m:\033[01;34m~\033[00m$
+%output %22 logout\015\012
+%output %22 Connection to solsys.io closed.\015\015\012
+%output %22 \033[1m\033[7m%\033[27m\033[1m\033[0m
+
+                                                           \015 \015
+%output %22 \015\033[0m\033[27m\033[24m\033[J\033[0m\033[49m\033[39m\033[0m\033[44m\033[38;5;254m \033[1m\033[38;5;254m\033[44m\033[38;5;25
+5m~\033[0m\033[38;5;255m\033[44m\033[44m\033[38;5;254m\033[0m\033[38;5;254m\033[44m\033[44m\033[38;5;254m \033[0m\033[38;5;254m\033[44m\033
+[100m\033[34m¼\033[0m\033[34m\033[100m\033[100m\033[30m \033[30m\033[30mmaster \033[30m!92 \033[30m?150\033[0m\033[30m\033[100m\033[100m\03
+3[30m \033[0m\033[30m\033[100m\033[49m\033[90m¼\033[0m\033[90m\033[49m\033[39m
+
+                                                                  \033[0m\033[49m\033[39m\015\012\033[0m\033[49m\033[38;5;76m¯\033[0m\033[3
+8;5;76m\033[49m\033[38;5;76m\033[0m\033[38;5;76m\033[49m\033[30m\033[0m\033[30m\033[49m\033[39m \033[0m\033[49m\033[39m\033[K
+%output %22 \033[?2004h
+%output %22 \033[?25l
+%output %22 \015\015\033M\033[0m\033[27m\033[24m\033[J\033[0m\033[49m\033[39m\033[0m\033[44m\033[38;5;254m \033[1m\033[38;5;254m\033[44m\03
+3[38;5;255m~\033[0m\033[38;5;255m\033[44m\033[44m\033[38;5;254m\033[0m\033[38;5;254m\033[44m\033[44m\033[38;5;254m \033[0m\033[38;5;254m\03
+3[44m\033[43m\033[34m¼\033[0m\033[34m\033[43m\033[43m\033[30m \033[30m\033[30mmaster \033[30m!92 \033[30m?150\033[0m\033[30m\033[43m\033[43
+m\033[30m \033[0m\033[30m\033[43m\033[49m\033[33m¼\033[0m\033[33m\033[49m\033[39m
+
+                                                                     \033[0m\033[49m\033[39m\015\012\033[0m\033[49m\033[38;5;76m¯\033[0m\03
+3[38;5;76m\033[49m\033[38;5;76m\033[0m\033[38;5;76m\033[49m\033[30m\033[0m\033[30m\033[49m\033[39m \033[0m\033[49m\033[39m\033[K\033[34h\03
+3[?25h
+%window-renamed @22 zsh
+

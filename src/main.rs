@@ -4,36 +4,151 @@ use rexpect::spawn;
 use std::process::Command;
 use std::{thread, time};
 
+// hooks layout-change window-add, session-create
+
 #[derive(Debug)]
 struct Prompt {
     name: String,
     regex: Regex,
 }
-// TODO paralell parsing for all sessions
-// TODO detect new sessions as the launch
+
+#[derive(Debug)]
+struct Window {
+    id: u32,
+    panes: Vec<u32>,
+}
+
+#[derive(Debug)]
+struct Tree {
+    sessions: Vec<u32>,
+    windows: Vec<Window>,
+}
+
+impl Tree {
+    fn new() -> Self {
+        let mut tree = Self {
+            sessions: vec![],
+            windows: vec![],
+        };
+
+        let output = Command::new("/usr/bin/tmux")
+            .arg("list-panes")
+            .arg("-a")
+            .arg("-F")
+            .arg("#{session_id}#{window_id}#{pane_id}")
+            .output()
+            .unwrap();
+        let output_string = String::from_utf8(output.stdout).unwrap();
+        let output_vec: Vec<&str> = output_string.split('\n').collect();
+
+        let re_tmux = Regex::new(r"^\$(\d+)@(\d+)%(\d+)\s*$").unwrap();
+
+        for line in output_vec {
+            match re_tmux.captures(line) {
+                Some(cap) => {
+                    let session_id = cap.get(1).unwrap().as_str().parse::<u32>().unwrap();
+                    let window_id = cap.get(2).unwrap().as_str().parse::<u32>().unwrap();
+                    let pane_id = cap.get(3).unwrap().as_str().parse::<u32>().unwrap();
+
+                    tree.sessions.push(session_id);
+                    tree.push_window(window_id);
+                    tree.add_pane_to_window(window_id, pane_id);
+                }
+                None => continue,
+            }
+        }
+        tree.sessions.dedup();
+
+        tree
+    }
+    fn refresh(&mut self) {
+        self.sessions = vec![];
+        self.windows = vec![];
+        let output = Command::new("/usr/bin/tmux")
+            .arg("list-panes")
+            .arg("-a")
+            .arg("-F")
+            .arg("#{session_id}#{window_id}#{pane_id}")
+            .output()
+            .unwrap();
+        let output_string = String::from_utf8(output.stdout).unwrap();
+        let output_vec: Vec<&str> = output_string.split('\n').collect();
+
+        let re_tmux = Regex::new(r"^\$(\d+)@(\d+)%(\d+)\s*$").unwrap();
+
+        for line in output_vec {
+            match re_tmux.captures(line) {
+                Some(cap) => {
+                    let session_id = cap.get(1).unwrap().as_str().parse::<u32>().unwrap();
+                    let window_id = cap.get(2).unwrap().as_str().parse::<u32>().unwrap();
+                    let pane_id = cap.get(3).unwrap().as_str().parse::<u32>().unwrap();
+
+                    self.sessions.push(session_id);
+                    self.push_window(window_id);
+                    self.add_pane_to_window(window_id, pane_id);
+                }
+                None => continue,
+            }
+        }
+        self.sessions.dedup();
+    }
+    fn push_window(&mut self, window_id: u32) {
+        for window in &self.windows {
+            if window.id == window_id {
+                return;
+            }
+        }
+        let window = Window::new(window_id);
+        self.windows.push(window);
+    }
+    fn add_pane_to_window(&mut self, window_id: u32, pane_id: u32) {
+        for window in &mut self.windows {
+            if window.id == window_id {
+                window.panes.push(pane_id);
+                return;
+            }
+        }
+        panic!("No window {} for pane {}", window_id, pane_id);
+    }
+    fn window_from_pane(self, pane_id: u32) -> u32 {
+        for window in &self.windows {
+            for pane in &window.panes {
+                if pane == &pane_id {
+                    return window.id;
+                }
+            }
+        }
+        panic!("Pane id {} does not belong to any windows", pane_id);
+    }
+}
+
+impl Window {
+    fn new(window_id: u32) -> Self {
+        return Window {
+            id: window_id,
+            panes: vec![],
+        };
+    }
+}
+
+// TODO tmux hook to start this upon session
+// TODO get target session via cli arg and attach to that, this way one instance will run per
+// session
 // TODO add other hosts from config file
 // TODO exit/sleep once all tmux sessions terminate
 
 fn main() {
-    // first get running sessions of tmux
-    let output = Command::new("/usr/bin/tmux").arg("ls").output().unwrap();
-    let output_string = String::from_utf8(output.stdout).unwrap();
-    let output_vec: Vec<&str> = output_string.split('\n').collect();
+    // first get running sessions, windows and panes of tmux
+    // tmux list-panes -a -F #{session_id}#{window_id}#{pane_id}
+    //let re_sess = Regex::new(r"^(\d+):\s+.*").unwrap();
 
-    let re_sess = Regex::new(r"^(\d+):\s+.*").unwrap();
-
-    let mut sessions = Vec::new();
     let prompts = vec![Prompt {
         name: "titan".to_string(),
         regex: Regex::new(r"^%output\s+(%\d+)\s+([A-Za-z\d]+)@titan:~\$\s*$").unwrap(),
     }];
 
-    for line in output_vec {
-        match re_sess.captures(line) {
-            Some(cap) => sessions.push(cap.get(1).unwrap().as_str()),
-            None => continue,
-        }
-    }
+    let mut tree = Tree::new();
+    panic!("asd");
     //let mut session = sessions[0];
     let session = "4";
     // attach to session command mode
@@ -52,8 +167,6 @@ fn main() {
             Err(_) => thread::sleep(delay),
         };
     }
-
-    println!("{:?}", sessions);
 }
 
 fn process_line(line: &str, prompts: &Vec<Prompt>) {

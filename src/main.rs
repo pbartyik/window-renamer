@@ -73,7 +73,6 @@ impl Tree {
             }
         }
         tree.sessions.dedup();
-        println!("Tree@init is {:?}", tree);
 
         tree
     }
@@ -120,7 +119,6 @@ impl Tree {
             }
         }
         self.sessions.dedup();
-        println!("after refresh {:?}", self);
     }
     fn get_window_of_pane(self, pane_id: u32) -> Option<u32> {
         for (w_id, p_ids) in &self.windows {
@@ -174,23 +172,7 @@ impl Tree {
         }
     }
     fn update_pane_title(self, pane_id: u32) {
-        println!("update_wt pane_id {}", pane_id);
         let window_id = self.clone().get_window_of_pane(pane_id).unwrap();
-        /*
-        let mut window_id = 4294967295;
-        for (w_id, p_ids) in &self.windows {
-        for p_id in p_ids {
-        if p_id == &pane_id {
-        window_id = *w_id;
-        }
-        }
-        }
-        if window_id == 4294967295 {
-        println!("Tree {:?}", self);
-        panic!("no window found");
-        }
-        */
-
         self.update_window_title(window_id.clone());
     }
     fn process_output(&mut self, line: &str) {
@@ -258,20 +240,17 @@ async fn main() {
         regex: Regex::new(r"^%output\s+%(\d+)\s+([A-Za-z\d]+)@titan:~\$\s*$").unwrap(),
     }];
 
-    // 0. gather tree and spawn attaches to existing sessions
-    // 1. start listening for changes
-    // 2. change tree based on changes
     let mut tree = Tree::new(prompts);
     let (mut tx, mut rx) = mpsc::channel(100);
 
     for session_id in tree.sessions.clone() {
         let mut my_tx = tx.clone();
+        let my_session_id = session_id.clone();
 
         task::spawn(async move {
-            let my_session_id = session_id.clone();
+            let delay = time::Duration::from_millis(10);
             let cmd = format!("/usr/bin/tmux -C attach -t {}", my_session_id);
             let mut sess = spawn(&cmd, Some(0)).unwrap();
-            let delay = time::Duration::from_millis(10);
 
             while sess.process.status().unwrap() == process::wait::WaitStatus::StillAlive {
                 let r_line = sess.read_line();
@@ -314,12 +293,10 @@ async fn main() {
                     tx.send(TreeInstruction::RemovePane(pane_id)).await;
                 }
                 Instruction::AttachTo(session_id) => {
-                    println!("supposed to attach to window {}", session_id);
                     let mut my_tx = tx.clone();
-                    task::spawn(async move {
-                        // attach to session command mode
+                    let my_session_id = session_id.clone();
 
-                        let my_session_id = session_id.clone();
+                    task::spawn(async move {
                         let cmd = format!("/usr/bin/tmux -C attach -t {}", my_session_id);
                         let mut sess = spawn(&cmd, Some(0)).unwrap();
                         let delay = time::Duration::from_millis(10);
@@ -337,6 +314,7 @@ async fn main() {
                                 }
                             };
                         }
+                        sess.exp_eof(); // read everything, so process doesn't hang
                     });
                 }
                 Instruction::DoNothing => (),
